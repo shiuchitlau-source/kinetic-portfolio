@@ -6,6 +6,5 @@ dist/
 .env
 .env.*
 !.env.example
-.openai/
-
-.vercel
+.openai/*
+!.openai/hosting.json
