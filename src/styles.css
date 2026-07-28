@@ -566,9 +566,7 @@ footer { padding: 115px 6vw 36px; background: var(--orange); }
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid var(--line-dark);
-  background: rgba(243, 240, 232, .78);
-  backdrop-filter: blur(24px) saturate(145%);
-  -webkit-backdrop-filter: blur(24px) saturate(145%);
+  background: var(--paper);
 }
 .dialog-bar p { font-size: 10px; text-transform: uppercase; letter-spacing: .12em; }
 .dialog-bar button { min-height: 42px; padding: 0 14px; border: 1px solid var(--line-dark); border-radius: 999px; background: rgba(255, 255, 255, .32); cursor: pointer; transition: transform 120ms ease-out, color 160ms ease, background-color 160ms ease; }
