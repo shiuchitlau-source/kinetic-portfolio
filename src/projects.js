@@ -11,6 +11,7 @@ export const projects = [
     roles: ["Motion Design", "Art Direction", "Set Design"],
     cover: asset("wise-future-store-london-cover.png"),
     gallery: [asset("wise-future-store-london-01.png"), asset("wise-future-store-london-03.png"), asset("wise-future-store-london-07.png")],
+    youtubeId: "2RPVS-Zvx6Y",
     summary: "A visual record of Wise Future Stores on Oxford Street: its lime-green flagship, Wisdom Bar, immersive digital installations and Jenki matcha collaboration.",
     challenge: "Show a busy retail flagship without losing the clarity of the brand or the warmth of the people moving through it.",
     solution: "Wide exteriors establish the Oxford Street scale, environmental interiors explain the experience, and close lifestyle frames bring the story back to one-to-one moments at the Wisdom Bar.",
