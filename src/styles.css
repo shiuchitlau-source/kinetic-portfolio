@@ -218,10 +218,14 @@ button { font: inherit; }
   display: flex;
   align-items: center;
   color: var(--ink);
-  animation: herd-marquee 17s linear infinite;
-  animation-fill-mode: both;
+  animation: herd-marquee 68s linear infinite;
   transform: translate3d(0, 0, 0);
   will-change: transform;
+}
+.herd-marquee-group {
+  display: flex;
+  flex: none;
+  align-items: center;
 }
 .herd-marquee-copy {
   flex: none;
@@ -290,8 +294,7 @@ button { font: inherit; }
   --herd-saturation: .96;
   --herd-sway: 5px;
 }
-.horse-stage:not(.horse-stage-active) .herd-horse,
-.horse-stage:not(.horse-stage-active) .herd-marquee-track {
+.horse-stage:not(.horse-stage-active) .herd-horse {
   animation-play-state: paused;
 }
 @keyframes herd-wiggle {

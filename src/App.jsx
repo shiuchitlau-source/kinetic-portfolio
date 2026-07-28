@@ -306,8 +306,18 @@ function RunningHorse({ active, onToggle }) {
             </span>
             <span className="herd-marquee">
               <span className="herd-marquee-track">
-                <span className="herd-marquee-copy">MAKE PIXELS MOVE&nbsp;&nbsp;</span>
-                <span className="herd-marquee-copy">MAKE PIXELS MOVE&nbsp;&nbsp;</span>
+                <span className="herd-marquee-group">
+                  <span className="herd-marquee-copy">MAKE PIXELS MOVE&nbsp;&nbsp;</span>
+                  <span className="herd-marquee-copy">MAKE PIXELS MOVE&nbsp;&nbsp;</span>
+                  <span className="herd-marquee-copy">MAKE PIXELS MOVE&nbsp;&nbsp;</span>
+                  <span className="herd-marquee-copy">MAKE PIXELS MOVE&nbsp;&nbsp;</span>
+                </span>
+                <span className="herd-marquee-group">
+                  <span className="herd-marquee-copy">MAKE PIXELS MOVE&nbsp;&nbsp;</span>
+                  <span className="herd-marquee-copy">MAKE PIXELS MOVE&nbsp;&nbsp;</span>
+                  <span className="herd-marquee-copy">MAKE PIXELS MOVE&nbsp;&nbsp;</span>
+                  <span className="herd-marquee-copy">MAKE PIXELS MOVE&nbsp;&nbsp;</span>
+                </span>
               </span>
             </span>
             <span className="herd-plane herd-plane-front">
