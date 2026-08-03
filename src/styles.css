@@ -336,6 +336,11 @@ button { font: inherit; }
     height: min(720px, calc(100svh - 216px));
   }
 }
+@media (min-width: 901px) and (min-aspect-ratio: 16/9) {
+  .herd-marquee-copy {
+    font-size: clamp(57.6px, 7.52vw, 126.4px);
+  }
+}
 
 .work { position: relative; padding: 32px 3.1vw 150px; color: var(--paper); background: var(--ink); }
 .work-intro { position: absolute; top: 32px; left: 3.1vw; z-index: 2; }
