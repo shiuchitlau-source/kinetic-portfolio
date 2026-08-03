@@ -242,7 +242,7 @@ button { font: inherit; }
   position: absolute;
   top: var(--herd-top);
   left: 0;
-  width: var(--herd-size);
+  width: calc(var(--herd-size) * 1.5);
   aspect-ratio: 160 / 112;
   display: block;
   filter: saturate(var(--herd-saturation, 1));
@@ -251,8 +251,8 @@ button { font: inherit; }
   will-change: transform;
 }
 .herd-horse-back-1 {
-  --herd-top: 25%;
-  --herd-x: 4vw;
+  --herd-top: 14%;
+  --herd-x: -2vw;
   --herd-size: min(24vw, calc((100svh - 250px) * .52), 360px);
   --herd-duration: 5.8s;
   --herd-delay: -2.1s;
@@ -260,8 +260,8 @@ button { font: inherit; }
   --herd-sway: 5px;
 }
 .herd-horse-back-2 {
-  --herd-top: 51%;
-  --herd-x: 68vw;
+  --herd-top: 58%;
+  --herd-x: 72vw;
   --herd-size: min(17vw, calc((100svh - 250px) * .37), 250px);
   --herd-duration: 6.4s;
   --herd-delay: -4.7s;
@@ -269,8 +269,8 @@ button { font: inherit; }
   --herd-sway: 4px;
 }
 .herd-horse-back-3 {
-  --herd-top: 16%;
-  --herd-x: 74vw;
+  --herd-top: 6%;
+  --herd-x: 82vw;
   --herd-size: min(14vw, calc((100svh - 250px) * .3), 210px);
   --herd-duration: 5.2s;
   --herd-delay: -3.2s;
@@ -278,16 +278,16 @@ button { font: inherit; }
   --herd-sway: 3px;
 }
 .herd-horse-front-1 {
-  --herd-top: 25%;
-  --herd-x: 31vw;
+  --herd-top: 22%;
+  --herd-x: 38vw;
   --herd-size: min(32vw, calc((100svh - 250px) * .7), 500px);
   --herd-duration: 4.8s;
   --herd-delay: -1.4s;
   --herd-sway: 7px;
 }
 .herd-horse-front-2 {
-  --herd-top: 53%;
-  --herd-x: 8vw;
+  --herd-top: 62%;
+  --herd-x: 2vw;
   --herd-size: min(22vw, calc((100svh - 250px) * .48), 330px);
   --herd-duration: 5.5s;
   --herd-delay: -3.8s;
@@ -669,28 +669,28 @@ footer { padding: 115px 6vw 36px; background: var(--orange); }
     letter-spacing: -.045em;
   }
   .herd-horse-back-1 {
-    --herd-top: 30%;
-    --herd-x: 0px;
+    --herd-top: 18%;
+    --herd-x: -8px;
     --herd-size: 110px;
   }
   .herd-horse-back-2 {
-    --herd-top: 55%;
-    --herd-x: calc(100vw - 130px);
+    --herd-top: 62%;
+    --herd-x: calc(100vw - 155px);
     --herd-size: 84px;
   }
   .herd-horse-back-3 {
-    --herd-top: 28%;
-    --herd-x: calc(100vw - 115px);
+    --herd-top: 12%;
+    --herd-x: calc(100vw - 95px);
     --herd-size: 70px;
   }
   .herd-horse-front-1 {
-    --herd-top: 30%;
-    --herd-x: 24vw;
+    --herd-top: 28%;
+    --herd-x: 32vw;
     --herd-size: min(45vw, 170px);
   }
   .herd-horse-front-2 {
-    --herd-top: 56%;
-    --herd-x: 5px;
+    --herd-top: 64%;
+    --herd-x: 0px;
     --herd-size: min(32vw, 120px);
   }
   .nameplate h1 { font-size: clamp(48px, 14.8vw, 68px); line-height: .81; letter-spacing: -.075em; }

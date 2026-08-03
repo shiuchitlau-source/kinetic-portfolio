@@ -307,16 +307,16 @@ function RunningHorse({ active, onToggle }) {
             <span className="herd-marquee">
               <span className="herd-marquee-track">
                 <span className="herd-marquee-group">
-                  <span className="herd-marquee-copy">MAKE PIXELS MOVE&nbsp;&nbsp;</span>
-                  <span className="herd-marquee-copy">MAKE PIXELS MOVE&nbsp;&nbsp;</span>
-                  <span className="herd-marquee-copy">MAKE PIXELS MOVE&nbsp;&nbsp;</span>
-                  <span className="herd-marquee-copy">MAKE PIXELS MOVE&nbsp;&nbsp;</span>
+                  <span className="herd-marquee-copy">MAKE PIXELS MOVE.&nbsp;&nbsp;</span>
+                  <span className="herd-marquee-copy">MAKE PIXELS MOVE.&nbsp;&nbsp;</span>
+                  <span className="herd-marquee-copy">MAKE PIXELS MOVE.&nbsp;&nbsp;</span>
+                  <span className="herd-marquee-copy">MAKE PIXELS MOVE.&nbsp;&nbsp;</span>
                 </span>
                 <span className="herd-marquee-group">
-                  <span className="herd-marquee-copy">MAKE PIXELS MOVE&nbsp;&nbsp;</span>
-                  <span className="herd-marquee-copy">MAKE PIXELS MOVE&nbsp;&nbsp;</span>
-                  <span className="herd-marquee-copy">MAKE PIXELS MOVE&nbsp;&nbsp;</span>
-                  <span className="herd-marquee-copy">MAKE PIXELS MOVE&nbsp;&nbsp;</span>
+                  <span className="herd-marquee-copy">MAKE PIXELS MOVE.&nbsp;&nbsp;</span>
+                  <span className="herd-marquee-copy">MAKE PIXELS MOVE.&nbsp;&nbsp;</span>
+                  <span className="herd-marquee-copy">MAKE PIXELS MOVE.&nbsp;&nbsp;</span>
+                  <span className="herd-marquee-copy">MAKE PIXELS MOVE.&nbsp;&nbsp;</span>
                 </span>
               </span>
             </span>
@@ -333,7 +333,7 @@ function RunningHorse({ active, onToggle }) {
           </span>
         </button>
       </div>
-      <h1 className="sr-only" id="hero-title">Make pixels move — animated halftone horse herd</h1>
+      <h1 className="sr-only" id="hero-title">MAKE PIXELS MOVE.</h1>
     </div>
   );
 }
