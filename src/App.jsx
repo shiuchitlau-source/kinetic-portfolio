@@ -281,9 +281,8 @@ function ProjectDialog({ project, onClose, onNext, onPrevious }) {
   );
 }
 
-function CommandMenu({ onClose, onNavigate, commands }) {
+function MobileMenu({ onClose, onNavigate, items, activeLabel }) {
   const [closing, setClosing] = useState(false);
-  const [command, setCommand] = useState("");
   const closingRef = useRef(false);
   const closeTimer = useRef(null);
   const menuRef = useRef(null);
@@ -293,49 +292,61 @@ function CommandMenu({ onClose, onNavigate, commands }) {
     closingRef.current = true;
     setClosing(true);
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    closeTimer.current = window.setTimeout(onClose, reducedMotion ? 0 : 280);
+    closeTimer.current = window.setTimeout(onClose, reducedMotion ? 0 : 420);
   };
 
   useContainedFocus(menuRef, requestClose);
 
-  useEffect(() => () => window.clearTimeout(closeTimer.current), []);
+  useEffect(() => {
+    document.body.classList.add("mobile-menu-open");
+    return () => {
+      window.clearTimeout(closeTimer.current);
+      document.body.classList.remove("mobile-menu-open");
+    };
+  }, []);
 
-  const navigate = (event) => onNavigate(event, requestClose);
-  const submitCommand = (event) => {
-    event.preventDefault();
-    const value = command.trim().toLowerCase();
-    if (!value) return;
-    if (value === "close" || value === "exit") {
-      requestClose();
-      return;
-    }
-    const destination = commands.find(({ label }) => label.startsWith(value));
-    if (destination) {
-      menuRef.current?.querySelector(`a[href="${destination.href}"]`)?.click();
-    }
+  const navigate = (event) => {
+    const href = event.currentTarget.getAttribute("href");
+    if (href?.startsWith("#")) onNavigate(event, requestClose);
+    else requestClose();
   };
+  const homeItem = items.find(([label]) => label === "Home");
+  const primaryItems = ["Services", "Work", "Contact"]
+    .map((label) => items.find(([itemLabel]) => itemLabel === label))
+    .filter(Boolean);
 
   return (
-    <aside id="command-menu" ref={menuRef} className={`command-menu${closing ? " is-closing" : ""}`} role="dialog" aria-modal="true" aria-label="Site command menu">
-      <div className="command-menu-top">
-        <p>BL Command Terminal</p>
-        <button type="button" onClick={requestClose} aria-label="Close command menu">×</button>
+    <aside id="mobile-menu" ref={menuRef} className={`mobile-menu${closing ? " is-closing" : ""}`} role="dialog" aria-modal="true" aria-label="Site menu">
+      <div className="mobile-menu-top">
+        <a className="mobile-menu-brand" href={homeItem?.[1] || "/"} onClick={navigate} aria-label="Benjamin Lau, home">
+          <img src="/assets/b-logo-angular-option-2.png" alt="" />
+          <span>Benjamin<br />Lau</span>
+        </a>
+        <button className="mobile-menu-close" data-autofocus type="button" onClick={requestClose}>Close</button>
       </div>
-      <form onSubmit={submitCommand}>
-        <label>
-          <span aria-hidden="true">:/</span>
-          <span className="sr-only">Enter command</span>
-          <input data-autofocus value={command} onChange={(event) => setCommand(event.target.value)} placeholder="Enter command" autoComplete="off" spellCheck="false" autoFocus />
-        </label>
-      </form>
-      <p className="command-menu-help">Start typing and see where it leads you… or use one of the prompts below.</p>
-      <nav aria-label="Command shortcuts">
-        {commands.map(({ label, href }) => <a key={label} href={href} onClick={navigate}>{label}</a>)}
-        <button type="button" onClick={requestClose}>close</button>
+
+      <nav className="mobile-menu-primary" aria-label="Mobile navigation">
+        {primaryItems.map(([label, href], index) => (
+          <a
+            className={`mobile-menu-link${index === primaryItems.length - 1 ? " is-square" : ""}${activeLabel === label ? " is-active" : ""}`}
+            href={href}
+            onClick={navigate}
+            style={{ "--menu-index": index }}
+            key={label}
+          >
+            <span className="mobile-menu-link-mask"><span>{label}</span><span aria-hidden="true">{label}</span></span>
+          </a>
+        ))}
       </nav>
-      <div className="command-menu-foot">
-        <p><kbd>ESC</kbd> to close</p>
-        <button type="button" onClick={() => setCommand("")}>Clear</button>
+
+      <div className="mobile-menu-meta">
+        <span className="mobile-menu-meta-label">Follow</span>
+        <div className="mobile-menu-socials">
+          <a href="https://www.linkedin.com/in/ben-shiu-chit-lau/" target="_blank" rel="noreferrer">LinkedIn</a>
+        </div>
+        <span className="mobile-menu-meta-label">General enquiries</span>
+        <a className="mobile-menu-email" href="mailto:shiuchitlau@gmail.com">shiuchitlau@gmail.com</a>
+        <p>© 2026 Benjamin Lau. All rights reserved.</p>
       </div>
     </aside>
   );
@@ -785,19 +796,6 @@ export function App() {
   const navigationItems = isServicesPage
     ? [["Home", "/"], ["Work", "/#work"], ["Services", "#top"], ["Contact", "#contact"]]
     : [["Home", "#top"], ["Work", "#work"], ["Services", "/services"], ["Contact", "#contact"]];
-  const commandItems = navigationItems.map(([label, href]) => ({ label: label.toLowerCase(), href }));
-
-  useEffect(() => {
-    const openCommandMenu = (event) => {
-      if (event.key !== "/" || event.metaKey || event.ctrlKey || event.altKey) return;
-      const target = event.target;
-      if (target instanceof HTMLElement && (target.matches("input, textarea, select") || target.isContentEditable)) return;
-      event.preventDefault();
-      setMenuOpen(true);
-    };
-    window.addEventListener("keydown", openCommandMenu);
-    return () => window.removeEventListener("keydown", openCommandMenu);
-  }, []);
 
   useEffect(() => {
     pixelPhaseRef.current = pixelPhase;
@@ -1012,7 +1010,7 @@ export function App() {
   };
 
   return (
-    <main className={`site${menuOpen ? " command-open" : ""}${isServicesPage ? " services-site" : ""}`} id="top">
+    <main className={`site${menuOpen ? " menu-open" : ""}${isServicesPage ? " services-site" : ""}`} id="top">
       <header className="hero-topbar">
         <a className="hero-brand" href={isServicesPage ? "/" : "#top"} aria-label="Benjamin Lau, home" onClick={handlePixelNavigation}>
           <span className="hero-brand-compact" aria-hidden="true">
@@ -1030,8 +1028,7 @@ export function App() {
             </a>
           ))}
         </nav>
-        <button type="button" className="menu-button" aria-expanded={menuOpen} aria-controls="command-menu" onClick={() => setMenuOpen((open) => !open)}>
-          <span className="menu-desktop-label">Press <kbd>/</kbd> for ?</span>
+        <button type="button" className="menu-button" aria-expanded={menuOpen} aria-controls="mobile-menu" onClick={() => setMenuOpen((open) => !open)}>
           <span className="menu-mobile-label">{menuOpen ? "Close" : "Menu"}</span>
         </button>
       </header>
@@ -1157,7 +1154,7 @@ export function App() {
         </div>
       </footer>
 
-      {menuOpen && <CommandMenu onClose={closeMenu} onNavigate={handlePixelNavigation} commands={commandItems} />}
+      {menuOpen && <MobileMenu onClose={closeMenu} onNavigate={handlePixelNavigation} items={navigationItems} activeLabel={isServicesPage ? "Services" : ""} />}
       {selected && (
         <ProjectDialog
           key={selected.id}
