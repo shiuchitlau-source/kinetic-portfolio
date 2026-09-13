@@ -232,7 +232,7 @@ function ProjectDialog({ project, onClose, onNext, onPrevious }) {
           <div><dt>Client</dt><dd>{project.client}</dd></div>
           <div><dt>Year</dt><dd>{project.year}</dd></div>
           {project.duration ? <div><dt>Duration</dt><dd>{project.duration}</dd></div> : null}
-          <div><dt>My role</dt><dd>{project.roles.join(" · ")}</dd></div>
+          <div><dt>My role</dt><dd>{project.roleSummary || `I contributed across ${project.roles.join(", ").replace(/, ([^,]*)$/, ", and $1").toLowerCase()}.`}</dd></div>
         </dl>
         <div className={`dialog-gallery${project.galleryFit === "contain" ? " dialog-gallery-contain" : ""}`}>
           {project.film ? (
@@ -1257,3 +1257,4 @@ export function App() {
     </main>
   );
 }
+
