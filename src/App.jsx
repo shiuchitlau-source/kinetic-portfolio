@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { HORSE_FRAME_HEIGHT, HORSE_FRAME_WIDTH, HORSE_FRAMES } from "./horseFrames";
 import { projects } from "./projects";
+import { isPlainNavigation, projectFromLocation, projectHref } from "./projectNavigation";
 
 const PIXEL_TILE_COUNT = 96;
 const PIXEL_COLUMNS = 12;
@@ -173,7 +174,8 @@ function useContainedFocus(containerRef, onClose) {
     return () => {
       window.cancelAnimationFrame(focusFrame);
       document.removeEventListener("keydown", containFocus);
-      if (previouslyFocused instanceof HTMLElement && previouslyFocused.isConnected) {
+      if (previouslyFocused instanceof HTMLElement && previouslyFocused.isConnected &&
+          (container.contains(document.activeElement) || document.activeElement === document.body)) {
         previouslyFocused.focus({ preventScroll: true });
       }
     };
@@ -218,7 +220,7 @@ function ProjectDialog({ project, onClose, onNext, onPrevious }) {
     <div className={`dialog-backdrop${closing ? " is-closing" : ""}`} role="presentation" onMouseDown={requestClose}>
       <article ref={dialogRef} className="project-dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title" aria-describedby="dialog-summary" onMouseDown={(event) => event.stopPropagation()}>
         <div className="dialog-bar">
-          <p>{project.type} · {project.year}</p>
+          <p>{project.title}</p>
           <button type="button" onClick={requestClose}>Close project</button>
         </div>
         <div className="dialog-hero">
@@ -226,14 +228,24 @@ function ProjectDialog({ project, onClose, onNext, onPrevious }) {
           <h2 id="dialog-title">{project.title}</h2>
           <p id="dialog-summary">{project.summary}</p>
         </div>
-        <dl className="project-meta">
+        <dl className={`project-meta${project.duration ? "" : " project-meta-three"}`}>
           <div><dt>Client</dt><dd>{project.client}</dd></div>
           <div><dt>Year</dt><dd>{project.year}</dd></div>
-          <div><dt>Duration</dt><dd>{project.duration}</dd></div>
-          <div><dt>Role</dt><dd>{project.roles.join(" · ")}</dd></div>
+          {project.duration ? <div><dt>Duration</dt><dd>{project.duration}</dd></div> : null}
+          <div><dt>My role</dt><dd>{project.roles.join(" · ")}</dd></div>
         </dl>
-        <div className="dialog-gallery">
-          {project.youtubeId ? (
+        <div className={`dialog-gallery${project.galleryFit === "contain" ? " dialog-gallery-contain" : ""}`}>
+          {project.film ? (
+            <video
+              className="project-film"
+              src={project.film}
+              poster={project.cover}
+              controls
+              playsInline
+              preload="metadata"
+              aria-label={`${project.title} film`}
+            />
+          ) : project.youtubeId ? (
             <div className="youtube-film">
               {videoOpen ? (
                 <iframe
@@ -253,6 +265,9 @@ function ProjectDialog({ project, onClose, onNext, onPrevious }) {
           ) : (
             <img className="gallery-lead" src={project.cover} alt={`${project.title} lead visual`} />
           )}
+          {(project.youtubeId || project.film) && (
+            <p className="film-fallback">Prefer another player? <a href={project.youtubeId ? `https://www.youtube.com/watch?v=${project.youtubeId}` : project.film} target="_blank" rel="noopener noreferrer">{project.youtubeId ? "Watch on YouTube" : "Open the film"} <span className="sr-only">(opens in a new tab)</span></a></p>
+          )}
           {project.gallery.map((src, index) => (
             <Media
               className={`gallery-visual gallery-visual-${index + 1}${project.gallery.length === 1 ? " gallery-single" : ""}`}
@@ -262,19 +277,20 @@ function ProjectDialog({ project, onClose, onNext, onPrevious }) {
             />
           ))}
         </div>
+        {project.contribution && <section className="project-contribution" aria-labelledby="contribution-title"><h3 id="contribution-title">My contribution</h3><p>{project.contribution}</p></section>}
         <div className="case-copy">
           <div><p>01 / The challenge</p><h3>{project.challenge}</h3></div>
           <div><p>02 / The solution</p><h3>{project.solution}</h3></div>
         </div>
         <nav className="project-navigation" aria-label="Project navigation">
-          <button type="button" onClick={onPrevious}>
+          <a href={projectHref(projects[(projects.indexOf(project) - 1 + projects.length) % projects.length])} onClick={onPrevious}>
             <span>Previous project</span>
             <strong>{projects[(projects.indexOf(project) - 1 + projects.length) % projects.length].title}</strong>
-          </button>
-          <button type="button" onClick={onNext}>
+          </a>
+          <a href={projectHref(projects[(projects.indexOf(project) + 1) % projects.length])} onClick={onNext}>
             <span>Next project</span>
             <strong>{projects[(projects.indexOf(project) + 1) % projects.length].title}</strong>
-          </button>
+          </a>
         </nav>
       </article>
     </div>
@@ -330,6 +346,7 @@ function MobileMenu({ onClose, onNavigate, items, activeLabel }) {
           <a
             className={`mobile-menu-link${index === primaryItems.length - 1 ? " is-square" : ""}${activeLabel === label ? " is-active" : ""}`}
             href={href}
+            aria-current={activeLabel === label ? "location" : undefined}
             onClick={navigate}
             style={{ "--menu-index": index }}
             key={label}
@@ -463,15 +480,18 @@ function HeroBackgroundVideo() {
       <video
         className="hero-background-video"
         ref={videoRef}
-        src="/assets/motion-reel-2025-c.mp4"
+        poster="/assets/motion-reel-2025-poster.jpg"
         muted
         loop
         autoPlay={!reducedMotion}
         playsInline
-        preload="auto"
+        preload="metadata"
         aria-hidden="true"
         tabIndex={-1}
-      />
+      >
+        <source src="/assets/hero-reel-mobile.mp4" type="video/mp4" media="(max-width: 640px)" />
+        <source src="/assets/hero-reel-desktop.mp4" type="video/mp4" />
+      </video>
       <button
         className="hero-reel-control"
         type="button"
@@ -519,7 +539,7 @@ function AnimatedHorseHero({ onNavigate }) {
       >
         <HorseCanvas frame={frame} />
       </a>
-      <h1 className="sr-only" id="hero-title">Moving Pixels — animated pixel horse</h1>
+      <h1 className="sr-only" id="hero-title">Benjamin Lau — Motion designer</h1>
     </div>
   );
 }
@@ -755,8 +775,8 @@ function ProjectItem({ project, index, onSelect }) {
   const hasPreview = project.id === "samsung-skate-park";
 
   return (
-    <article className={`project-item project-item-${index + 1}`}>
-      <button className="project-visual" type="button" onClick={() => onSelect(project)} aria-label={`Open ${project.title} case study`}>
+    <article className={`project-item project-item-${project.id}`}>
+      <a className="project-visual" href={projectHref(project)} onClick={(event) => onSelect(event, project)} aria-label={`Open ${project.title} case study`}>
         {hasPreview ? (
           <video
             src="/assets/shiuchit/samsung-skate-park-img-6089.mp4"
@@ -771,21 +791,59 @@ function ProjectItem({ project, index, onSelect }) {
           <img src={project.cover} alt={`${project.title} cover`} loading={index < 2 ? "eager" : "lazy"} decoding="async" />
         )}
         <span>View project</span>
-      </button>
-      <button className="project-label" type="button" onClick={() => onSelect(project)}>
+      </a>
+      <a className="project-label" href={projectHref(project)} onClick={(event) => onSelect(event, project)}>
         <small>{String(index + 1).padStart(2, "0")}</small>
         <span>
           <strong>{project.title}</strong>
           <em>{project.eyebrow || project.type} · {project.year}</em>
         </span>
-      </button>
+      </a>
     </article>
   );
 }
 
 export function App() {
   const isServicesPage = window.location.pathname.replace(/\/+$/, "") === "/services";
-  const [selected, setSelected] = useState(null);
+  const [selected, setSelected] = useState(() => projectFromLocation(projects));
+  const projectOpener = useRef(null);
+  const [activeSection, setActiveSection] = useState(window.location.hash || "#top");
+  const [headerHidden, setHeaderHidden] = useState(false);
+  useEffect(() => {
+    const syncLocation = () => {
+      setSelected(projectFromLocation(projects));
+      setActiveSection(window.location.hash || "#top");
+    };
+    window.addEventListener("popstate", syncLocation);
+    window.addEventListener("hashchange", syncLocation);
+    return () => {
+      window.removeEventListener("popstate", syncLocation);
+      window.removeEventListener("hashchange", syncLocation);
+    };
+  }, []);
+  useEffect(() => {
+    if (selected || !projectOpener.current?.isConnected) return;
+    const frame = requestAnimationFrame(() => projectOpener.current?.focus({ preventScroll: true }));
+    return () => cancelAnimationFrame(frame);
+  }, [selected]);
+  const openProject = (event, project, replace = false) => {
+    if (!isPlainNavigation(event)) return;
+    event.preventDefault();
+    if (!selected) projectOpener.current = event.currentTarget;
+    const state = replace ? window.history.state : { ...window.history.state, portfolioProject: true };
+    window.history[replace ? "replaceState" : "pushState"](state, "", projectHref(project));
+    setSelected(project);
+  };
+  const closeProject = useCallback(() => {
+    if (window.history.state?.portfolioProject) {
+      window.history.back();
+    } else {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("project");
+      window.history.replaceState(window.history.state, "", `${url.pathname}${url.search}${url.hash}`);
+      setSelected(null);
+    }
+  }, []);
   const [menuOpen, setMenuOpen] = useState(false);
   const [pixelPhase, setPixelPhase] = useState("intro-covered");
   const [pixelSchedule, setPixelSchedule] = useState(createPixelTransitionSchedule);
@@ -793,9 +851,33 @@ export function App() {
   const pixelTimersRef = useRef([]);
   const pixelFramesRef = useRef([]);
   const closeMenu = useCallback(() => setMenuOpen(false), []);
+  useEffect(() => {
+    let lastY = window.scrollY;
+    let anchorY = lastY;
+    let direction = 0;
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const y = Math.max(0, window.scrollY);
+      const nextDirection = Math.sign(y - lastY);
+      if (nextDirection && nextDirection !== direction) { anchorY = lastY; direction = nextDirection; }
+      if (y < 120) setHeaderHidden(false);
+      else if (Math.abs(y - anchorY) > 12) setHeaderHidden(direction > 0);
+      lastY = y;
+      const sections = [...document.querySelectorAll("#work, #project-index, #contact")];
+      const current = sections.filter((section) => section.getBoundingClientRect().top <= innerHeight * .3).at(-1);
+      setActiveSection(current ? `#${current.id === "project-index" ? "work" : current.id}` : "#top");
+    };
+    const onScroll = () => { if (!frame) frame = requestAnimationFrame(update); };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => { window.removeEventListener("scroll", onScroll); cancelAnimationFrame(frame); };
+  }, []);
   const navigationItems = isServicesPage
     ? [["Home", "/"], ["Work", "/#work"], ["Services", "#top"], ["Contact", "#contact"]]
     : [["Home", "#top"], ["Work", "#work"], ["Services", "/services"], ["Contact", "#contact"]];
+  const activeLabel = activeSection === "#contact" ? "Contact"
+    : isServicesPage ? "Services"
+    : activeSection === "#work" || activeSection === "#project-index" ? "Work" : "Home";
 
   useEffect(() => {
     pixelPhaseRef.current = pixelPhase;
@@ -825,15 +907,19 @@ export function App() {
   }, []);
 
   const handlePixelNavigation = (event, afterNavigate) => {
+    if (!isPlainNavigation(event)) return;
     const href = event.currentTarget.getAttribute("href");
     if (!href?.startsWith("#")) return;
     event.preventDefault();
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const navigate = () => {
-      document.querySelector(href)?.scrollIntoView({ behavior: "instant", block: "start" });
+      const destination = document.querySelector(href);
+      if (destination) window.scrollTo({ top: window.scrollY + destination.getBoundingClientRect().top, behavior: "instant" });
       window.history.pushState(null, "", href);
+      setActiveSection(href);
       afterNavigate?.();
+      if (destination) { destination.tabIndex = -1; destination.focus({ preventScroll: true }); }
     };
 
     if (reducedMotion) {
@@ -997,21 +1083,23 @@ export function App() {
     };
   }, [isServicesPage]);
 
-  const nextProject = () => {
+  const nextProject = (event) => {
     const index = projects.indexOf(selected);
-    setSelected(projects[(index + 1) % projects.length]);
+    openProject(event, projects[(index + 1) % projects.length], true);
+    if (!event.defaultPrevented) return;
     document.querySelector(".project-dialog")?.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const previousProject = () => {
+  const previousProject = (event) => {
     const index = projects.indexOf(selected);
-    setSelected(projects[(index - 1 + projects.length) % projects.length]);
+    openProject(event, projects[(index - 1 + projects.length) % projects.length], true);
+    if (!event.defaultPrevented) return;
     document.querySelector(".project-dialog")?.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
     <main className={`site${menuOpen ? " menu-open" : ""}${isServicesPage ? " services-site" : ""}`} id="top">
-      <header className="hero-topbar">
+      <header className={`hero-topbar${headerHidden && !menuOpen && !selected ? " is-hidden" : ""}`}>
         <a className="hero-brand" href={isServicesPage ? "/" : "#top"} aria-label="Benjamin Lau, home" onClick={handlePixelNavigation}>
           <span className="hero-brand-compact" aria-hidden="true">
             <img className="hero-monogram" src="/assets/b-logo-angular-option-2.png" alt="" />
@@ -1023,7 +1111,7 @@ export function App() {
         </a>
         <nav className="hero-nav" aria-label="Primary navigation">
           {navigationItems.map(([label, href], index) => (
-            <a className={`${index % 2 === 0 ? "nav-chip nav-chip-square" : "nav-chip nav-chip-pill"}${isServicesPage && label === "Services" ? " is-active" : ""}`} href={href} onClick={handlePixelNavigation} key={label}>
+            <a className={`${index % 2 === 0 ? "nav-chip nav-chip-square" : "nav-chip nav-chip-pill"}${activeLabel === label ? " is-active" : ""}`} aria-current={activeLabel === label ? "location" : undefined} href={href} onClick={handlePixelNavigation} key={label}>
               <span className="nav-chip-mask"><span>{label}</span><span aria-hidden="true">{label}</span></span>
             </a>
           ))}
@@ -1045,14 +1133,15 @@ export function App() {
           <section className="work" id="work" aria-labelledby="work-title">
             <div className="work-intro">
               <p>Selected work</p>
+              <a className="project-index-shortcut" href="#project-index" onClick={handlePixelNavigation}>Project index ({projects.length})</a>
               <h2 className="sr-only" id="work-title">Projects in motion.</h2>
             </div>
             <div className="project-constellation">
               {projects.map((project, index) => (
-                <ProjectItem key={project.id} project={project} index={index} onSelect={setSelected} />
+                <ProjectItem key={project.id} project={project} index={index} onSelect={openProject} />
               ))}
             </div>
-            <a className="view-all" href="#project-index" onClick={handlePixelNavigation}>View all ({projects.length})</a>
+            <a className="view-all" href="#project-index" onClick={handlePixelNavigation}>Browse project index ({projects.length})</a>
           </section>
 
           <section className="project-index" id="project-index" aria-labelledby="index-title">
@@ -1060,12 +1149,12 @@ export function App() {
             <h2 id="index-title">Selected work, 2022—2026</h2>
             <div className="index-list">
               {projects.map((project, index) => (
-                <button type="button" onClick={() => setSelected(project)} key={project.id}>
+                <a href={projectHref(project)} onClick={(event) => openProject(event, project)} key={project.id}>
                   <span>{String(index + 1).padStart(2, "0")}</span>
                   <strong>{project.title}</strong>
                   <em>{project.eyebrow || project.type}</em>
                   <time>{project.year}</time>
-                </button>
+                </a>
               ))}
             </div>
           </section>
@@ -1076,10 +1165,10 @@ export function App() {
         <div className="services-hero">
           <div>
             <p className="section-kicker services-kicker"><span>Independent services</span></p>
-            <h2 id="services-title" aria-label="Ideas built to move.">
+            <h1 id="services-title" aria-label="Ideas built to move.">
               <span className="services-title-line" aria-hidden="true"><span>Ideas built</span></span>
               <span className="services-title-line" aria-hidden="true"><span>to move.</span></span>
-            </h2>
+            </h1>
           </div>
           <div className="services-intro-copy">
             <div className="services-copy-mask"><p>I partner with brands, agencies and production teams to turn a clear idea into motion people can feel.</p></div>
@@ -1111,7 +1200,7 @@ export function App() {
                     <span>Selected work</span>
                     <div>
                       {relatedProjects.map((project, projectIndex) => (
-                        <button style={{ "--work-index": projectIndex }} type="button" onClick={() => setSelected(project)} key={project.id}>{project.title}</button>
+                        <a style={{ "--work-index": projectIndex }} href={projectHref(project)} onClick={(event) => openProject(event, project)} key={project.id}><span>{project.title}</span></a>
                       ))}
                     </div>
                   </div>
@@ -1145,7 +1234,7 @@ export function App() {
         <div className="footer-lead">
           <p>Available for selected projects</p>
           <h2>Let’s make<br />pixels move.</h2>
-          <a href="https://www.linkedin.com/in/ben-shiu-chit-lau/" target="_blank" rel="noreferrer">Start a conversation</a>
+          <div className="footer-contact-links"><a href="mailto:shiuchitlau@gmail.com">shiuchitlau@gmail.com</a><a href="https://www.linkedin.com/in/ben-shiu-chit-lau/" target="_blank" rel="noopener noreferrer">LinkedIn <span className="sr-only">(opens in a new tab)</span></a></div>
         </div>
         <div className="footer-meta">
           <p>London / UK</p>
@@ -1154,12 +1243,12 @@ export function App() {
         </div>
       </footer>
 
-      {menuOpen && <MobileMenu onClose={closeMenu} onNavigate={handlePixelNavigation} items={navigationItems} activeLabel={isServicesPage ? "Services" : ""} />}
+      {menuOpen && <MobileMenu onClose={closeMenu} onNavigate={handlePixelNavigation} items={navigationItems} activeLabel={activeLabel} />}
       {selected && (
         <ProjectDialog
           key={selected.id}
           project={selected}
-          onClose={() => setSelected(null)}
+          onClose={closeProject}
           onNext={nextProject}
           onPrevious={previousProject}
         />
