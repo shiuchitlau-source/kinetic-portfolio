@@ -61,6 +61,7 @@ export const projects = [
     client: "Midnite",
     duration: "2 weeks",
     roles: ["Motion Design", "Brand Identity", "Creative Direction"],
+    roleSummary: "I shaped the campaign’s motion language and visual identity, developing the creative direction across AIGC-led sequences, stylised 2D and 3D graphics, and final social cutdowns.",
     cover: asset("kinetic-identity-cover.png"),
     gallery: [asset("midnite-gallery-1.png"), asset("midnite-gallery-2.png")],
     youtubeId: "NU2W1CMjTo0",
