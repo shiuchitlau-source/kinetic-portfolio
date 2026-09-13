@@ -277,7 +277,6 @@ function ProjectDialog({ project, onClose, onNext, onPrevious }) {
             />
           ))}
         </div>
-        {project.contribution && <section className="project-contribution" aria-labelledby="contribution-title"><h3 id="contribution-title">My contribution</h3><p>{project.contribution}</p></section>}
         <div className="case-copy">
           <div><p>01 / The challenge</p><h3>{project.challenge}</h3></div>
           <div><p>02 / The solution</p><h3>{project.solution}</h3></div>
