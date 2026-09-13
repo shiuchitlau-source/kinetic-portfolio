@@ -26,5 +26,6 @@ test("approved order, film and single Wise still stay intact", () => {
   assert.deepEqual(projects.slice(0,3).map(project => project.id), ["wise-future-store-london", "hublot-tourbillion", "wise-digital-cards"]);
   assert.equal(projects[2].youtubeId, "_EC-MCCvu5s");
   assert.equal(projects[2].gallery.length, 1);
-  assert.match(projects[2].gallery[0], /transactions-universal/);
+  assert.match(projects[2].gallery[0], /wise-digital-cards/);
 });
+

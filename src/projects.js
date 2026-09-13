@@ -42,10 +42,10 @@ export const projects = [
     client: "Wise",
     roles: ["Motion Design", "Storyboarding", "Animation"],
     contribution: "I worked on motion design, storyboarding and animation for Wise digital cards.",
-    cover: asset("wise-digital-card-radial.png"),
+    cover: asset("wise-digital-cards.png"),
     youtubeId: "_EC-MCCvu5s",
     gallery: [
-      asset("wise-digital-card-transactions-universal.png"),
+      asset("wise-digital-cards.png"),
     ],
     galleryFit: "contain",
     summary: "A colourful motion system for Wise digital cards, bringing textured surfaces, currency and everyday transactions into one expressive 3D world.",
@@ -180,3 +180,4 @@ export const projects = [
     solution: "The narrative centres confidence, individuality and the fun of getting ready, reframing Valentine’s Day as personal style rather than a conventional romance story.",
   },
 ];
+
